@@ -71,9 +71,20 @@ class Transferencia {
   final int numeroConta;
 
   Transferencia(this.valor, this.numeroConta);
+
+  @override
+  String toStrig() {
+    return '$valor e $numeroConta';
+  }
+
+
 }
 
 class FormularioTransferencia extends StatelessWidget {
+
+  final TextEditingController _controladorCampoNumeroConta = TextEditingController();
+  final TextEditingController _controladorCampoValor = TextEditingController() ;
+
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -82,6 +93,7 @@ class FormularioTransferencia extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: TextField(
+            controller: _controladorCampoNumeroConta,
             keyboardType: TextInputType.number,
             style: TextStyle(
               fontSize: 18.0,
@@ -96,6 +108,7 @@ class FormularioTransferencia extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: TextField(
+            controller: _controladorCampoValor,
             keyboardType: TextInputType.number,
             style: TextStyle(
               fontSize: 18.0,
@@ -108,7 +121,18 @@ class FormularioTransferencia extends StatelessWidget {
           ),
         ),
 
-        ElevatedButton(onPressed: null, child: Text('Confirmar'))
+        ElevatedButton(
+          onPressed: () {
+            debugPrint('Clicou');
+
+            final int? numeroConta = int.tryParse(_controladorCampoNumeroConta.text);
+            final double? valor = double.tryParse(_controladorCampoValor.text);
+            if (numeroConta != null && valor != null) {
+              final transferenciaCriada = Transferencia(valor, numeroConta);
+              debugPrint('$transferenciaCriada');
+            }
+          },
+          child: Text('Confirmar'))
       ],)
     );
   }
