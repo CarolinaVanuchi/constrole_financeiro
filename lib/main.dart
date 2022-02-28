@@ -19,7 +19,7 @@ class ByteBankApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-          body: FormularioTransferencia(),
+          body: ListaTransferencias(),
         ),     
       );
   }
@@ -41,7 +41,13 @@ class ListaTransferencias extends StatelessWidget {
             
          floatingActionButton: FloatingActionButton(
            onPressed: () {
-              // Add your onPressed code here!
+             final Future future = Navigator.push(context, MaterialPageRoute(builder: (context){
+               return FormularioTransferencia();
+             }));
+              future.then((transferenciaCriada){
+                debugPrint('$transferenciaCriada');
+                debugPrint('AAA');
+              });
             },
             child: Icon(Icons.add),
           ),
@@ -76,8 +82,6 @@ class Transferencia {
   String toStrig() {
     return '$valor e $numeroConta';
   }
-
-
 }
 
 class FormularioTransferencia extends StatelessWidget {
@@ -85,57 +89,61 @@ class FormularioTransferencia extends StatelessWidget {
   final TextEditingController _controladorCampoNumeroConta = TextEditingController();
   final TextEditingController _controladorCampoValor = TextEditingController() ;
 
+  _criarTransferencia(BuildContext context) {
+      final int? numeroConta = int.tryParse(_controladorCampoNumeroConta.text);
+      final double? valor = double.tryParse(_controladorCampoValor.text);
+      if (numeroConta != null && valor != null) {
+        final transferenciaCriada = Transferencia(valor, numeroConta);
+        Navigator.pop(context, transferenciaCriada);
+      }
+  }
+
   @override
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(title: Text('Criando Transfência'),),
       body: Column(children: [
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: TextField(
-            controller: _controladorCampoNumeroConta,
-            keyboardType: TextInputType.number,
-            style: TextStyle(
-              fontSize: 18.0,
-            ),
-            decoration: InputDecoration(
-              labelText: 'Numero da conta',
-              hintText: '0000'
-            ),
-          ),
-        ),
-        
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: TextField(
-            controller: _controladorCampoValor,
-            keyboardType: TextInputType.number,
-            style: TextStyle(
-              fontSize: 18.0,
-            ),
-            decoration: InputDecoration(
-              icon: Icon(Icons.monetization_on),
-              labelText: 'Valor',
-              hintText: '00.00'
-            ),
-          ),
-        ),
+
+        Editor(controlador: _controladorCampoNumeroConta, rotulo: 'Número da Conta', dica: '00000'),
+        Editor(controlador:_controladorCampoValor, rotulo:'Valor', dica:'00.00', icone:Icons.monetization_on),
 
         ElevatedButton(
           onPressed: () {
-            debugPrint('Clicou');
-
-            final int? numeroConta = int.tryParse(_controladorCampoNumeroConta.text);
-            final double? valor = double.tryParse(_controladorCampoValor.text);
-            if (numeroConta != null && valor != null) {
-              final transferenciaCriada = Transferencia(valor, numeroConta);
-              debugPrint('$transferenciaCriada');
-            }
+            _criarTransferencia(context);
           },
           child: Text('Confirmar'))
       ],)
     );
   }
+
+
 }
 
+class Editor extends StatelessWidget {
+  
+  final TextEditingController? controlador;
+  final String? rotulo;
+  final String? dica;
+  final IconData? icone;
 
+  Editor({this.controlador, this.rotulo, this.dica, this.icone});
+
+  @override
+  Widget build(BuildContext) {
+    return Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: TextField(
+              controller: controlador,
+              keyboardType: TextInputType.number,
+              style: TextStyle(
+                fontSize: 16.0
+              ),
+              decoration: InputDecoration(
+                icon: icone != null ? Icon(icone): null,
+                labelText: rotulo,
+                hintText: dica
+              ),
+            ),
+        );  
+  }
+}
